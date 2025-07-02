@@ -62,11 +62,6 @@ const RocketList = () => {
   useEffect(() => {
     fetchRockets();
   }, []);
-
-  useEffect(() => {
-    filterRockets();
-  }, [searchKeyword, selectedName, selectedCountry, rockets]);
-
   const filterRockets = () => {
     let result = rockets;
 
@@ -89,6 +84,10 @@ const RocketList = () => {
 
     setFiltered(result);
   };
+
+  useEffect(() => {
+    filterRockets();
+  }, [searchKeyword, selectedName, selectedCountry, rockets]);
 
   const onFinishAdd = (values) => {
     const newRocket = {
