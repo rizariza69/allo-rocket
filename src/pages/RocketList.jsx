@@ -103,7 +103,6 @@ const RocketList = () => {
   };
 
   const defaultImage = filtered[0]?.flickr_images[0];
-  console.log(defaultImage);
 
   if (loading) {
     return (
