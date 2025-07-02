@@ -1,107 +1,47 @@
-import { useEffect, useState } from "react";
-import { getRockets } from "../services/api";
-import RocketCard from "../components/RocketCard";
 import {
-  Row,
-  Col,
+  Layout,
+  Typography,
   Input,
+  Select,
   Button,
-  Spin,
-  Alert,
   Modal,
   Form,
-  Typography,
-  Layout,
-  Select,
-  message,
+  Alert,
+  Row,
+  Col,
+  Spin,
 } from "antd";
-import { getLocalRockets, addLocalRocket } from "../utils/localStorage";
+import RocketCard from "../components/RocketCard";
+import { useRocket } from "../context/RocketContext";
+import { useState } from "react";
 
 const { Title } = Typography;
 const { Content, Header } = Layout;
 
 const RocketList = () => {
-  const [rockets, setRockets] = useState([]);
-  const [filtered, setFiltered] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const {
+    filtered,
+    loading,
+    error,
+    names,
+    countries,
+    searchKeyword,
+    setSearchKeyword,
+    selectedName,
+    setSelectedName,
+    selectedCountry,
+    setSelectedCountry,
+    addRocket,
+  } = useRocket();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [selectedName, setSelectedName] = useState(null);
-  const [selectedCountry, setSelectedCountry] = useState(null);
-  const [names, setNames] = useState([]);
-  const [countries, setCountries] = useState([]);
-
-  const fetchRockets = async () => {
-    try {
-      setLoading(true);
-      const res = await getRockets();
-      const local = getLocalRockets();
-      const all = [...res.data, ...local];
-      setRockets(all);
-      setFiltered(all);
-      updateDropdownOptions(all);
-      setError(false);
-    } catch (err) {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateDropdownOptions = (data) => {
-    const uniqueNames = [...new Set(data.map((r) => r.name).filter(Boolean))];
-    const uniqueCountries = [
-      ...new Set(data.map((r) => r.country).filter(Boolean)),
-    ];
-    setNames(uniqueNames);
-    setCountries(uniqueCountries);
-  };
-
-  useEffect(() => {
-    fetchRockets();
-  }, []);
-  const filterRockets = () => {
-    let result = rockets;
-
-    if (searchKeyword) {
-      const keyword = searchKeyword.toLowerCase();
-      result = result.filter(
-        (r) =>
-          r.name?.toLowerCase().includes(keyword) ||
-          r.description?.toLowerCase().includes(keyword)
-      );
-    }
-
-    if (selectedName) {
-      result = result.filter((r) => r.name === selectedName);
-    }
-
-    if (selectedCountry) {
-      result = result.filter((r) => r.country === selectedCountry);
-    }
-
-    setFiltered(result);
-  };
-
-  useEffect(() => {
-    filterRockets();
-  }, [searchKeyword, selectedName, selectedCountry, rockets]);
-
   const onFinishAdd = (values) => {
-    const newRocket = {
-      ...values,
-      id: `local-${Date.now()}`,
-      flickr_images: [values.image],
-    };
-    addLocalRocket(newRocket);
-    message.success("✅ Roket berhasil ditambahkan!");
-    fetchRockets();
+    addRocket(values);
     setIsModalOpen(false);
   };
 
-  const defaultImage = filtered[0]?.flickr_images[0];
+  const defaultImage = filtered[0]?.flickr_images?.[0];
 
   if (loading) {
     return (
@@ -123,13 +63,6 @@ const RocketList = () => {
             type="error"
             showIcon
           />
-          <Button
-            type="primary"
-            style={{ marginTop: 16 }}
-            onClick={fetchRockets}
-          >
-            🔄 Retry
-          </Button>
         </Content>
       </Layout>
     );
@@ -210,6 +143,7 @@ const RocketList = () => {
             </Col>
           )}
         </Row>
+
         <Modal
           title="Add New Rocket"
           open={isModalOpen}

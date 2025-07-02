@@ -20,7 +20,7 @@ const RocketDetail = () => {
         const res = await getRockets();
         const local = getLocalRockets();
         const all = [...res.data, ...local];
-        const found = all.find((r) => r.id === id);
+        const found = all.find((value) => value.id === id);
         setRocket(found);
       } catch {
         setRocket(null);
