@@ -83,7 +83,7 @@ const RocketList = () => {
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
           <Col xs={24} sm={8}>
             <Input.Search
-              placeholder="Search name or description"
+              placeholder="Search name"
               allowClear
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
